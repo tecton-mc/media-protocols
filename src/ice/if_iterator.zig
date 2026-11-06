@@ -116,7 +116,7 @@ fn nextPosixInterfaceAddress(it: *IfIterator) ?std.Io.net.IpAddress {
                 if (!it.network_types.udp4) continue;
                 if (ifa.*.flags & IFF_LOOPBACK != 0) continue;
 
-                const in: posix.sockaddr.in = @bitCast(sockaddr);
+                const in: *posix.sockaddr.in = @ptrCast(@alignCast(ifa.*.addr));
                 return .{ .ip4 = .{ .bytes = std.mem.toBytes(in.addr), .port = 0 } };
             },
             posix.AF.INET6 => {

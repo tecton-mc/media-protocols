@@ -533,7 +533,7 @@ pub const RtcpFb = struct {
             if (std.mem.eql(u8, pt, "*")) break :blk .all;
             const pt_int = std.fmt.parseInt(u8, pt, 10) catch return error.InvalidAttribute;
             if (pt_int > 127) return error.InvalidAttribute;
-            break :blk @enumFromInt(pt_int);
+            break :blk @fromBackingInt(@intCast(pt_int));
         };
 
         result.value = it.next() orelse return error.InvalidAttribute;
@@ -544,7 +544,7 @@ pub const RtcpFb = struct {
     pub fn write(fb: *const RtcpFb, w: *Writer) !void {
         switch (fb.payload_type) {
             .all => try w.print("* {s}", .{fb.value}),
-            else => |pt| try w.print("{d} {s}", .{ @intFromEnum(pt), fb.value }),
+            else => |pt| try w.print("{d} {s}", .{ @backingInt(pt), fb.value }),
         }
 
         if (fb.param.len != 0) {
@@ -608,7 +608,7 @@ test "RtmMap: parse invalid " {
 test "RtcpFb: parse" {
     {
         const fb = try RtcpFb.parse("96 nack pli");
-        try std.testing.expectEqual(96, @intFromEnum(fb.payload_type));
+        try std.testing.expectEqual(96, @backingInt(fb.payload_type));
         try std.testing.expectEqualStrings("nack", fb.value);
         try std.testing.expectEqualStrings("pli", fb.param);
     }
@@ -768,7 +768,7 @@ test "parse attribute" {
     {
         const attr = try (Attribute{ .key = "rtcp-fb", .value = "96 nack pli" }).parse();
         try std.testing.expectEqual(.rtcp_fb, @as(AttributeType, attr));
-        try std.testing.expectEqual(96, @intFromEnum(attr.rtcp_fb.payload_type));
+        try std.testing.expectEqual(96, @backingInt(attr.rtcp_fb.payload_type));
         try std.testing.expectEqualStrings("nack", attr.rtcp_fb.value);
         try std.testing.expectEqualStrings("pli", attr.rtcp_fb.param);
     }
@@ -923,7 +923,7 @@ test "ParsedAttribute: write" {
     try expectWrite(&w, .{ .setup = .actpass }, "a=setup:actpass\r\n");
     try expectWrite(
         &w,
-        .{ .rtcp_fb = .{ .payload_type = @enumFromInt(96), .value = "nack", .param = "pli" } },
+        .{ .rtcp_fb = .{ .payload_type = @fromBackingInt(@intCast(96)), .value = "nack", .param = "pli" } },
         "a=rtcp-fb:96 nack pli\r\n",
     );
     try expectWrite(

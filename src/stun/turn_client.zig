@@ -367,11 +367,11 @@ pub fn TurnClient(comptime config: Config) type {
             std.mem.writeInt(u16, buffer[2..4], @intCast(size - stun.header_size), .big);
 
             const addr = buffer[stun.header_size + 4 .. header_size - 4];
-            std.mem.writeInt(u16, buffer[20..22], @intFromEnum(stun.AttributeType.xor_peer_address), .big);
+            std.mem.writeInt(u16, buffer[20..22], @backingInt(stun.AttributeType.xor_peer_address), .big);
             std.mem.writeInt(u16, buffer[22..24], @intCast(addr.len), .big);
             stun.Writer.writeIpAddress(addr, peer.*, &tx_id);
 
-            std.mem.writeInt(u16, buffer[header_size - 4 ..][0..2], @intFromEnum(stun.AttributeType.data), .big);
+            std.mem.writeInt(u16, buffer[header_size - 4 ..][0..2], @backingInt(stun.AttributeType.data), .big);
             std.mem.writeInt(u16, buffer[header_size - 2 ..][0..2], @intCast(payload_len), .big);
         }
 

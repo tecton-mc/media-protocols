@@ -127,7 +127,7 @@ pub const Request = struct {
     ) Writer.Error!void {
         var out = request.server.writer;
         try out.print("RTSP/1.0 {} {s}\r\n", .{
-            @intFromEnum(options.status),
+            @backingInt(options.status),
             options.reason orelse options.status.phrase() orelse "",
         });
 

@@ -48,7 +48,7 @@ pub const ItemIterator = struct {
 
         const value = bytes[2 .. @as(usize, bytes[1]) + 2];
         it.bytes = it.bytes[value.len + 2 ..];
-        return .{ .item_type = @enumFromInt(bytes[0]), .value = value };
+        return .{ .item_type = @fromBackingInt(@intCast(bytes[0])), .value = value };
     }
 };
 
